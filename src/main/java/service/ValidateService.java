@@ -2,6 +2,7 @@ package service;
 
 import dto.UserLoginDto;
 import dto.UserRegisterDto;
+import handler.CaptchaHandler;
 
 import java.util.regex.Pattern;
 
@@ -14,12 +15,10 @@ public class ValidateService {
         String name = userDto.name();
         String email = userDto.email();
         String password = userDto.password();
-        String captcha = userDto.captcha();
 
         if (name.isBlank()) throw new IllegalArgumentException("Name cannot be blank or null");
         if (email.isBlank()) throw new IllegalArgumentException("Email cannot be blank or null");
         if (password.isBlank()) throw new IllegalArgumentException("Password cannot be blank or null");
-        if (captcha.isBlank()) throw new IllegalArgumentException("Invalid captcha");
 
         if (!EMAIL_PATTERN.matcher(email).matches()) {
             throw new IllegalArgumentException("Invalid email format");
@@ -33,6 +32,19 @@ public class ValidateService {
         }
         if (!password.matches(".*[A-Z].*")) {
             throw new IllegalArgumentException("Password must include at least 1 capital letter");
+        }
+    }
+
+  public static void validateCaptcha(UserRegisterDto userDto) {
+        String answer = CaptchaHandler.captchaStore.get(userDto.captchaId());
+        if (answer == null) {
+            throw new IllegalArgumentException("Invalid captcha id");
+        }
+
+        CaptchaHandler.captchaStore.remove(userDto.captchaId());
+
+        if (!answer.equals(userDto.captchaAnswer().trim())) {
+            throw new IllegalArgumentException("Invalid captcha");
         }
     }
 }

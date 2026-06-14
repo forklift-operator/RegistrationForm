@@ -1,12 +1,13 @@
+package handler;
+
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import dto.ExceptionDto;
-import dto.UserLoginDto;
+import dto.UserRegisterDto;
 import dto.UserResponseDto;
-import model.User;
 import repository.UserRepository;
-import service.SessionService;
+import service.ValidateService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,34 +16,43 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
-public class LoginHandler implements HttpHandler {
-    Gson gson = new Gson();
-    UserRepository userRepository = new UserRepository();
+public class RegisterHandler implements HttpHandler {
+
+    private final Gson gson = new Gson();
+    private final UserRepository userRepository = new UserRepository();
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String requestMethod = exchange.getRequestMethod();
+
         if (requestMethod.equals("POST")) {
             try (InputStream is = exchange.getRequestBody()) {
-                UserLoginDto userDto = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), UserLoginDto.class);
+                UserRegisterDto userDto = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), UserRegisterDto.class);
 
-                User user = userRepository.findByEmail(userDto.email());
+                ValidateService.validateRegisterDto(userDto);
+                ValidateService.validateCaptcha(userDto);
 
-                if (user == null || !user.getPassword().equals(userDto.password())) {
-                    throw new IllegalArgumentException("Wrong credentials");
+                if (userRepository.existsByEmail(userDto.email())) {
+                    sendResponse(exchange, 400, new ExceptionDto("Email already exists"));
                 }
 
-                String sessionId = SessionService.createSession(user.getEmail());
-                String cookieValue = String.format("session_id=%s; Path=/; HttpOnly; Max-Age=3600", sessionId);
-                exchange.getResponseHeaders().add("Set-Cookie", cookieValue);
+                Long userId = userRepository.saveUser(userDto);
 
-                sendResponse(exchange, 200, new UserResponseDto(user.getId(), user.getName(), user.getEmail()));
+                UserResponseDto user = new UserResponseDto(userId, userDto.name(), userDto.email());
 
+                sendResponse(exchange, 200, user);
             } catch (IllegalArgumentException e) {
-                sendResponse(exchange, 400, new ExceptionDto(e.getMessage()));
+                ExceptionDto exceptionDto = new ExceptionDto(e.getMessage());
+                sendResponse(exchange, 400, exceptionDto);
+
             } catch (SQLException e) {
-                sendResponse(exchange, 500, new ExceptionDto("Database error: " + e.getMessage()));
+                ExceptionDto exceptionDto = new ExceptionDto("Database error: " + e.getMessage());
+                sendResponse(exchange, 500, exceptionDto);
+
+            } catch (Exception e) {
+                sendResponse(exchange, 500, new ExceptionDto("Server error: " + e.getMessage()));
             }
+
         } else {
             ExceptionDto exceptionDto = new ExceptionDto("Invalid request method");
             sendResponse(exchange, 405, exceptionDto);
