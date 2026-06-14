@@ -29,7 +29,6 @@ public class LoginHandler implements HttpHandler {
             try (InputStream is = exchange.getRequestBody()) {
                 UserLoginDto userDto = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), UserLoginDto.class);
                 ValidateService.validateLoginDto(userDto);
-                ValidateService.validateCaptcha(userDto.captchaId(), userDto.captchaAnswer());
 
                 User user = userRepository.findByEmail(userDto.email());
 
