@@ -2,18 +2,22 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import dto.ExceptionDto;
-import dto.RegisterDto;
+import dto.RegisterUserDto;
 import dto.UserResponseDto;
+import repository.UserRepository;
+import service.ValidateService;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 
 public class RegistrationHandler implements HttpHandler {
 
     private final Gson gson = new Gson();
+    private final UserRepository userRepository = new UserRepository();
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -21,27 +25,31 @@ public class RegistrationHandler implements HttpHandler {
 
         if (requestMethod.equals("POST")) {
             try (InputStream is = exchange.getRequestBody()) {
-                RegisterDto data = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), RegisterDto.class);
+                RegisterUserDto userDto = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), RegisterUserDto.class);
 
-                String name = data.name();
-                String email = data.email();
-                String password = data.password();
-                String captcha = data.captcha();
+                ValidateService.validateCredentials(userDto);
 
-                System.out.println(name + " " + email + " " + password + " " + captcha);
+                System.out.println(userDto.name() + " " + userDto.email() + " " + userDto.password() + " " + userDto.captcha());
 
+                if (userRepository.existsByEmail(userDto.email())) {
+                    sendResponse(exchange, 400, new ExceptionDto("Email already exists"));
+                }
 
+                Long userId = userRepository.saveUser(userDto);
 
-                UserResponseDto user = new UserResponseDto(1L, name, email);
+                UserResponseDto user = new UserResponseDto(userId, userDto.name(), userDto.email());
 
                 sendResponse(exchange, 200, user);
             } catch (IllegalArgumentException e) {
                 ExceptionDto exceptionDto = new ExceptionDto(e.getMessage());
                 sendResponse(exchange, 400, exceptionDto);
 
+            } catch (SQLException e) {
+                ExceptionDto exceptionDto = new ExceptionDto("Database error: " + e.getMessage());
+                sendResponse(exchange, 500, exceptionDto);
+
             } catch (Exception e) {
-                ExceptionDto exceptionDto = new ExceptionDto("Malformed request or invalid data: " + e.getMessage());
-                sendResponse(exchange, 400, exceptionDto);
+                sendResponse(exchange, 500, new ExceptionDto("Server error: " + e.getMessage()));
             }
 
         } else {
