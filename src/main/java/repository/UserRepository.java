@@ -1,7 +1,7 @@
 package repository;
 
 import config.DatabaseConfig;
-import dto.RegisterDto;
+import dto.RegisterUserDto;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class UserRepository {
-    public Long saveUser(RegisterDto userDto) throws IOException, SQLException {
+    public Long saveUser(RegisterUserDto userDto) throws IOException, SQLException {
         String sql = "INSERT INTO users (name, email, password) VALUES (?,?,?)";
 
         try (Connection connection = DatabaseConfig.getConnection();
@@ -33,6 +33,20 @@ public class UserRepository {
                 } else {
                     throw new SQLException("Creating user failed, no ID obtained");
                 }
+            }
+        }
+    }
+
+    public boolean existsByEmail(String email) throws SQLException {
+        String sql = "SELECT 1 FROM users WHERE email = ? LIMIT 1";
+
+        try(Connection connection = DatabaseConfig.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, email);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
             }
         }
     }
