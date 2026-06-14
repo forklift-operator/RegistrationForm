@@ -2,7 +2,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import dto.ExceptionDto;
-import dto.RegisterUserDto;
+import dto.UserRegisterDto;
 import dto.UserResponseDto;
 import repository.UserRepository;
 import service.ValidateService;
@@ -25,9 +25,9 @@ public class RegistrationHandler implements HttpHandler {
 
         if (requestMethod.equals("POST")) {
             try (InputStream is = exchange.getRequestBody()) {
-                RegisterUserDto userDto = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), RegisterUserDto.class);
+                UserRegisterDto userDto = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), UserRegisterDto.class);
 
-                ValidateService.validateCredentials(userDto);
+                ValidateService.validateRegisterDto(userDto);
 
                 System.out.println(userDto.name() + " " + userDto.email() + " " + userDto.password() + " " + userDto.captcha());
 

@@ -1,7 +1,8 @@
 package repository;
 
 import config.DatabaseConfig;
-import dto.RegisterUserDto;
+import dto.UserRegisterDto;
+import model.User;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -11,7 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class UserRepository {
-    public Long saveUser(RegisterUserDto userDto) throws IOException, SQLException {
+    public Long saveUser(UserRegisterDto userDto) throws IOException, SQLException {
         String sql = "INSERT INTO users (name, email, password) VALUES (?,?,?)";
 
         try (Connection connection = DatabaseConfig.getConnection();
@@ -40,8 +41,8 @@ public class UserRepository {
     public boolean existsByEmail(String email) throws SQLException {
         String sql = "SELECT 1 FROM users WHERE email = ? LIMIT 1";
 
-        try(Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseConfig.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, email);
 
@@ -49,5 +50,27 @@ public class UserRepository {
                 return resultSet.next();
             }
         }
+    }
+
+    public User findByEmail(String email) throws SQLException {
+        String sql = "SELECT id, name, email, password FROM users WHERE email = ?";
+        try (Connection connection = DatabaseConfig.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, email);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new User(
+                            resultSet.getLong("id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("email"),
+                            resultSet.getString("password")
+                    );
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package service;
 
-import dto.RegisterUserDto;
+import dto.UserLoginDto;
+import dto.UserRegisterDto;
 
 import java.util.regex.Pattern;
 
@@ -9,7 +10,7 @@ public class ValidateService {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
 
-    public static void validateCredentials(RegisterUserDto userDto) {
+    public static void validateRegisterDto(UserRegisterDto userDto) {
         String name = userDto.name();
         String email = userDto.email();
         String password = userDto.password();
