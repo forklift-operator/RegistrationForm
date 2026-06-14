@@ -54,6 +54,7 @@ public class UserRepository {
 
     public User findByEmail(String email) throws SQLException {
         String sql = "SELECT id, name, email, password FROM users WHERE email = ?";
+
         try (Connection connection = DatabaseConfig.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
@@ -72,5 +73,20 @@ public class UserRepository {
         }
 
         return null;
+    }
+
+    public boolean updateUser(String name, String email, String password) throws SQLException {
+        String sql = "UPDATE users SET name = ?, password = ? WHERE email = ?";
+
+        try (Connection connection = DatabaseConfig.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, name);
+            statement.setString(2, password);
+            statement.setString(3, email);
+
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        }
     }
 }

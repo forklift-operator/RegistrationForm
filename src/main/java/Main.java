@@ -1,7 +1,9 @@
 import com.sun.net.httpserver.HttpServer;
+import handler.CaptchaHandler;
 import handler.LoginHandler;
 import handler.LogoutHandler;
 import handler.RegisterHandler;
+import handler.UpdateHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -13,7 +15,8 @@ public class Main {
         server.createContext("/register", new RegisterHandler());
         server.createContext("/login", new LoginHandler());
         server.createContext("/logout", new LogoutHandler());
-        server.createContext("/captcha", new LogoutHandler());
+        server.createContext("/update", new UpdateHandler());
+        server.createContext("/captcha", new CaptchaHandler());
 
         server.setExecutor(null);
 
