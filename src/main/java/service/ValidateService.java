@@ -14,15 +14,19 @@ public class ValidateService {
     public static void validateRegisterDto(UserRegisterDto userDto) {
         String name = userDto.name();
         String email = userDto.email();
-        String password = userDto.password();
 
         if (name.isBlank()) throw new IllegalArgumentException("Name cannot be blank or null");
         if (email.isBlank()) throw new IllegalArgumentException("Email cannot be blank or null");
-        if (password.isBlank()) throw new IllegalArgumentException("Password cannot be blank or null");
 
         if (!EMAIL_PATTERN.matcher(email).matches()) {
             throw new IllegalArgumentException("Invalid email format");
         }
+
+        validatePassword(userDto.password());
+    }
+
+    public static void validatePassword(String password) {
+        if (password.isBlank()) throw new IllegalArgumentException("Password cannot be blank or null");
 
         if (password.length() < 8) {
             throw new IllegalArgumentException("Password must be at least 8 symbols");
