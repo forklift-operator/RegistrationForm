@@ -35,15 +35,24 @@ public class ValidateService {
         }
     }
 
-  public static void validateCaptcha(UserRegisterDto userDto) {
-        String answer = CaptchaHandler.captchaStore.get(userDto.captchaId());
+    public static void validateLoginDto(UserLoginDto userDto) {
+        if (userDto.email().isBlank()) {
+            throw new IllegalArgumentException("Email is blank or null");
+        }
+        if (userDto.password().isBlank()) {
+            throw new IllegalArgumentException("Password is blank or null");
+        }
+    }
+
+    public static void validateCaptcha(String captchaId, String captchaAnswer) {
+        String answer = CaptchaHandler.captchaStore.get(captchaId);
         if (answer == null) {
             throw new IllegalArgumentException("Invalid captcha id");
         }
 
-        CaptchaHandler.captchaStore.remove(userDto.captchaId());
+        CaptchaHandler.captchaStore.remove(captchaId);
 
-        if (!answer.equals(userDto.captchaAnswer().trim())) {
+        if (!answer.equals(captchaAnswer.trim())) {
             throw new IllegalArgumentException("Invalid captcha");
         }
     }

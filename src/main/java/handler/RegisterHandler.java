@@ -30,7 +30,7 @@ public class RegisterHandler implements HttpHandler {
                 UserRegisterDto userDto = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), UserRegisterDto.class);
 
                 ValidateService.validateRegisterDto(userDto);
-                ValidateService.validateCaptcha(userDto);
+                ValidateService.validateCaptcha(userDto.captchaId(), userDto.captchaAnswer());
 
                 if (userRepository.existsByEmail(userDto.email())) {
                     sendResponse(exchange, 400, new ExceptionDto("Email already exists"));

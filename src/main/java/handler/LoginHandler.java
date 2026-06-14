@@ -9,6 +9,7 @@ import dto.UserResponseDto;
 import model.User;
 import repository.UserRepository;
 import service.SessionService;
+import service.ValidateService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +28,8 @@ public class LoginHandler implements HttpHandler {
         if (requestMethod.equals("POST")) {
             try (InputStream is = exchange.getRequestBody()) {
                 UserLoginDto userDto = gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), UserLoginDto.class);
-
+                ValidateService.validateLoginDto(userDto);
+                ValidateService.validateCaptcha(userDto.captchaId(), userDto.captchaAnswer());
 
                 User user = userRepository.findByEmail(userDto.email());
 
