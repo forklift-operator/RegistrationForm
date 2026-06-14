@@ -18,7 +18,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
-
 public class UpdateHandler implements HttpHandler {
     private static final Gson gson = new Gson();
     private final UserRepository userRepository = new UserRepository();

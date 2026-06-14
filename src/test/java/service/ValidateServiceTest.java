@@ -82,13 +82,13 @@ public class ValidateServiceTest {
 
     @Test
     public void testLogin_Success() {
-        UserLoginDto dto = new UserLoginDto("stoyan@gmail.com", "Password123", null, null);
+        UserLoginDto dto = new UserLoginDto("stoyan@gmail.com", "Password123");
         assertDoesNotThrow(() -> ValidateService.validateLoginDto(dto));
     }
 
     @Test
     public void testLogin_BlankEmail_ThrowsException() {
-        UserLoginDto dto = new UserLoginDto("", "Password123", null, null);
+        UserLoginDto dto = new UserLoginDto("", "Password123");
         Exception exception = assertThrows(IllegalArgumentException.class, () ->
                 ValidateService.validateLoginDto(dto)
         );
@@ -97,7 +97,7 @@ public class ValidateServiceTest {
 
     @Test
     public void testLogin_BlankPassword_ThrowsException() {
-        UserLoginDto dto = new UserLoginDto("stoyan@gmail.com", "   ", null, null);
+        UserLoginDto dto = new UserLoginDto("stoyan@gmail.com", "   ");
         Exception exception = assertThrows(IllegalArgumentException.class, () ->
                 ValidateService.validateLoginDto(dto)
         );
