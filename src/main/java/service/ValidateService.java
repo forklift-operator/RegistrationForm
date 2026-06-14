@@ -1,18 +1,20 @@
-package dto;
+package service;
+
+import dto.RegisterUserDto;
 
 import java.util.regex.Pattern;
 
-public record RegisterDto(
-        String name,
-        String email,
-        String password,
-        String captcha
-) {
+public class ValidateService {
 
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
 
-    public RegisterDto {
+    public static void validateCredentials(RegisterUserDto userDto) {
+        String name = userDto.name();
+        String email = userDto.email();
+        String password = userDto.password();
+        String captcha = userDto.captcha();
+
         if (name.isBlank()) throw new IllegalArgumentException("Name cannot be blank or null");
         if (email.isBlank()) throw new IllegalArgumentException("Email cannot be blank or null");
         if (password.isBlank()) throw new IllegalArgumentException("Password cannot be blank or null");
