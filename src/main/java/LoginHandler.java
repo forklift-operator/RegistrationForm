@@ -6,6 +6,7 @@ import dto.UserLoginDto;
 import dto.UserResponseDto;
 import model.User;
 import repository.UserRepository;
+import service.SessionService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,10 @@ public class LoginHandler implements HttpHandler {
                     throw new IllegalArgumentException("Wrong credentials");
                 }
 
+                String sessionId = SessionService.createSession(user.getEmail());
+                String cookieValue = String.format("session_id=%s; Path=/; HttpOnly; Max-Age=3600", sessionId);
+                exchange.getResponseHeaders().add("Set-Cookie", cookieValue);
+
                 sendResponse(exchange, 200, new UserResponseDto(user.getId(), user.getName(), user.getEmail()));
 
             } catch (IllegalArgumentException e) {
@@ -39,7 +44,8 @@ public class LoginHandler implements HttpHandler {
                 sendResponse(exchange, 500, new ExceptionDto("Database error: " + e.getMessage()));
             }
         } else {
-
+            ExceptionDto exceptionDto = new ExceptionDto("Invalid request method");
+            sendResponse(exchange, 405, exceptionDto);
         }
     }
 

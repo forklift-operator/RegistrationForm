@@ -8,6 +8,7 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
         server.createContext("/register", new RegistrationHandler());
+        server.createContext("/login", new LoginHandler());
 
         server.setExecutor(null);
 
