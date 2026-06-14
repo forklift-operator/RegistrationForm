@@ -2,6 +2,7 @@ import com.sun.net.httpserver.HttpServer;
 import handler.CaptchaHandler;
 import handler.LoginHandler;
 import handler.LogoutHandler;
+import handler.MeHandler;
 import handler.RegisterHandler;
 import handler.StaticFileHandler;
 import handler.UpdateHandler;
@@ -18,6 +19,7 @@ public class Main {
         server.createContext("/logout", new LogoutHandler());
         server.createContext("/update", new UpdateHandler());
         server.createContext("/captcha", new CaptchaHandler());
+        server.createContext("/me", new MeHandler());
 
         server.createContext("/", new StaticFileHandler("/index.html"));
         server.createContext("/login.html", new StaticFileHandler("/login.html"));
