@@ -3,6 +3,7 @@ import handler.CaptchaHandler;
 import handler.LoginHandler;
 import handler.LogoutHandler;
 import handler.RegisterHandler;
+import handler.StaticFileHandler;
 import handler.UpdateHandler;
 
 import java.io.IOException;
@@ -18,6 +19,10 @@ public class Main {
         server.createContext("/update", new UpdateHandler());
         server.createContext("/captcha", new CaptchaHandler());
 
+        server.createContext("/", new StaticFileHandler("/index.html"));
+        server.createContext("/login.html", new StaticFileHandler("/login.html"));
+        server.createContext("/register.html", new StaticFileHandler("/register.html"));
+        server.createContext("/profile", new StaticFileHandler("/profile.html"));
         server.setExecutor(null);
 
         server.start();
