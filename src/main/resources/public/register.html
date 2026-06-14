@@ -2,24 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Регистрация</title>
+    <title>Register</title>
 </head>
 <body>
-<h2>Регистрация</h2>
+<h2>Register</h2>
 <form id="registerForm">
-    <input type="text" id="regName" placeholder="Име и Фамилия" required><br><br>
-    <input type="email" id="regEmail" placeholder="Имейл" required><br><br>
-    <input type="password" id="regPassword" placeholder="Парола" required><br><br>
+    <input type="text" id="regName" placeholder="Name" required><br><br>
+    <input type="email" id="regEmail" placeholder="Email" required><br><br>
+    <input type="password" id="regPassword" placeholder="Password" required><br><br>
 
-    <label id="captchaQuestion">Зареждане на CAPTCHA...</label>
-    <input type="text" id="captchaAnswer" placeholder="Отговор" required>
+    <label id="captchaQuestion"></label>
+    <input type="text" id="captchaAnswer" placeholder="Answer" required>
     <input type="hidden" id="captchaId"><br><br>
 
-    <button type="submit">Регистрирай се</button>
+    <button type="submit">Register</button>
 </form>
 
 <br>
-<button onclick="window.location.href='/login.html'">Вече имаш акаунт? Влез тук</button>
+<button onclick="window.location.href='/login.html'">Login</button>
 
 <script>
     function loadCaptcha() {
@@ -45,10 +45,8 @@
             .then(res => res.json())
             .then(data => {
                 if(data.message) {
-                    alert(data.message);
                     loadCaptcha();
                 } else {
-                    alert("Успешна регистрация! Автоматично пренасочване към профила...");
                     window.location.href = "/profile";
                 }
             });
