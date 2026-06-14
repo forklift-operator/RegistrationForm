@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Моят Профил</title>
+</head>
+<body>
+<div id="loading">Проверка на сесията... Моля, изчакайте.</div>
+
+<div id="profileSection" style="display: none;">
+    <h2>Добре дошли, <span id="welcomeName"></span>!</h2>
+    <p>Вашият имейл: <span id="welcomeEmail"></span></p>
+
+    <h3>Промяна на имената и паролата</h3>
+    <form id="updateForm">
+        <input type="text" id="newName" placeholder="Ново име"><br><br>
+        <input type="password" id="newPassword" placeholder="Нова парола"><br><br>
+        <button type="submit">Запази промените</button>
+    </form>
+
+    <br><br>
+    <button onclick="handleLogout()" style="background-color: red; color: white;">Изход (Logout)</button>
+</div>
+
+<script>
+    // 1. Проверка при зареждане чрез GET /me
+    window.onload = function() {
+        fetch('/me')
+            .then(res => {
+                if (res.status === 401) {
+                    alert("Не сте логнат! Пренасочване към началната страница.");
+                    window.location.href = "/";
+                    throw new Error("Unauthorized");
+                }
+                return res.json();
+            })
+            .then(user => {
+                // Ако всичко е наред, показваме секцията и пълним данните
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('profileSection').style.display = 'block';
+                document.getElementById('welcomeName').innerText = user.name;
+                document.getElementById('welcomeEmail').innerText = user.email;
+            })
+            .catch(err => console.log("Session check failed."));
+    };
+
+    // 2. Логика за Update
+    document.getElementById('updateForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const body = {};
+        const nameVal = document.getElementById('newName').value;
+        const passVal = document.getElementById('newPassword').value;
+
+        if(nameVal) body.name = nameVal;
+        if(passVal) body.password = passVal;
+
+        fetch('/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if(data.message) alert(data.message);
+                else {
+                    alert("Профилът е обновен успешно!");
+                    location.reload(); // Презареждаме, за да види новото си име
+                }
+            });
+    });
+
+    // 3. Логика за Logout
+    function handleLogout() {
+        fetch('/logout', { method: 'POST' })
+            .then(() => {
+                alert("Излязохте успешно!");
+                window.location.href = "/";
+            });
+    }
+</script>
+</body>
+</html>
