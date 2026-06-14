@@ -7,6 +7,7 @@ import dto.ExceptionDto;
 import dto.UserRegisterDto;
 import dto.UserResponseDto;
 import repository.UserRepository;
+import service.SessionService;
 import service.ValidateService;
 
 import java.io.IOException;
@@ -39,6 +40,10 @@ public class RegisterHandler implements HttpHandler {
                 Long userId = userRepository.saveUser(userDto);
 
                 UserResponseDto user = new UserResponseDto(userId, userDto.name(), userDto.email());
+
+                String sessionId = SessionService.createSession(user.email());
+                String cookieValue = String.format("session_id=%s; Path=/; HttpOnly; Max-Age=3600", sessionId);
+                exchange.getResponseHeaders().add("Set-Cookie", cookieValue);
 
                 sendResponse(exchange, 200, user);
             } catch (IllegalArgumentException e) {
