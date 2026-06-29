@@ -19,8 +19,12 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
 public class LoginHandler implements HttpHandler {
-    Gson gson = new Gson();
-    UserRepository userRepository = new UserRepository();
+    private final Gson gson = new Gson();
+    private final UserRepository userRepository;
+
+    public LoginHandler(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {

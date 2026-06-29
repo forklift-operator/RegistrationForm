@@ -20,7 +20,11 @@ import java.sql.SQLException;
 
 public class UpdateHandler implements HttpHandler {
     private static final Gson gson = new Gson();
-    private final UserRepository userRepository = new UserRepository();
+    private final UserRepository userRepository;
+
+    public UpdateHandler(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
