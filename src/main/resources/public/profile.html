@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Моят Профил</title>
+    <title>Profile</title>
 </head>
 <body>
 <div id="profileSection" style="display: none;">
+    <h3 id="errorMessage"></h3>
     <h2>Hello, <span id="welcomeName"></span>!</h2>
     <p>Email: <span id="welcomeEmail"></span></p>
 
     <h3>Update info</h3>
+    <h4 id="errorMessageUpdate"></h4>
     <form id="updateForm">
         <input type="text" id="newName" placeholder="New name"><br><br>
         <input type="password" id="newPassword" placeholder="New password"><br><br>
@@ -32,12 +34,14 @@
                 return res.json();
             })
             .then(user => {
-                document.getElementById('loading').style.display = 'none';
                 document.getElementById('profileSection').style.display = 'block';
                 document.getElementById('welcomeName').innerText = user.name;
                 document.getElementById('welcomeEmail').innerText = user.email;
             })
-            .catch(err => console.log("Session check failed."));
+            .catch(err => {
+                document.getElementById("errorMessage").textContent = err
+                console.log("Session check failed.");
+            });
     };
 
     document.getElementById('updateForm').addEventListener('submit', function(e) {
@@ -56,7 +60,10 @@
         })
             .then(res => res.json())
             .then(data => {
-                if(data.message) alert(data.message);
+                if(data.message) {
+                    console.error(data.message);
+                    document.getElementById("errorMessageUpdate").textContent = data.message;
+                }
                 else {
                     location.reload();
                 }
