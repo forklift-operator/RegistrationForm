@@ -6,6 +6,7 @@
 </head>
 <body>
 <h2>Register</h2>
+<h3 id="errorMessage"></h3>
 <form id="registerForm">
     <input type="text" id="regName" placeholder="Name" required><br><br>
     <input type="email" id="regEmail" placeholder="Email" required><br><br>
@@ -46,6 +47,7 @@
             .then(data => {
                 if(data.message) {
                     loadCaptcha();
+                    document.getElementById("errorMessage").textContent = data.message;
                 } else {
                     window.location.href = "/profile";
                 }

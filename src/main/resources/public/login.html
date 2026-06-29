@@ -6,6 +6,8 @@
 </head>
 <body>
 <h2>Login</h2>
+<!--error message will be displayed here-->
+<h3 id="errorMessage"></h3>
 <form id="loginForm">
     <input type="email" id="loginEmail" placeholder="Email" required><br><br>
     <input type="password" id="loginPassword" placeholder="Password" required><br><br>
@@ -25,9 +27,9 @@
         fetch('/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) })
             .then(res => res.json())
             .then(data => {
-                if(data.message) alert(data.message);
-                else {
-                    alert("Успешен вход!");
+                if(data.message) {
+                    document.getElementById('errorMessage').textContent = data.message;
+                } else {
                     window.location.href = "/profile";
                 }
             });
